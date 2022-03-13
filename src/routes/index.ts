@@ -1,10 +1,10 @@
-import { Router } from 'express';
-import GameRouter from './game.route';
-
+import { Router, Request, Response } from 'express';
 
 const router: Router = Router();
 
-router.use('/game', GameRouter);
+router.use('/', (req: Request, res: Response) => {
+    res.status(200).send('Hello World!');
+});
 
 
 export default router;
