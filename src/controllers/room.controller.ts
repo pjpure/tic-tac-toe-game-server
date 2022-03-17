@@ -28,11 +28,7 @@ function RoomController(io: Server, socket: Socket) {
             socket.join(roomId);
             const room = gameService.gameStart(roomId);
             socket.emit("room:joined", roomId, room);
-            io.in(roomId).emit("game:start", room);
-            // const player1 = room.players[0];
-            // const player2 = room.players[1];
-            // io.to(player1.id).emit("game:start", { player: player1, board: room.board });
-            // io.to(player2.id).emit("game:start", { player: player2, board: room.board });
+            io.in(roomId).emit("game:start", roomId, room);
         } else {
             socket.emit("room:full");
         }

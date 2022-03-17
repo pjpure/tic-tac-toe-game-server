@@ -12,6 +12,7 @@ const createBoard = (size: number) => {
 const gameStart = (roomId: string) => {
     let room = rooms[roomId];
     room.board = createBoard(room.boardSize);
+    room.status = "playing";
     room.isPlay = true;
     room.players.forEach((player: Player, index: number) => {
         if (index == 0) {
@@ -54,7 +55,9 @@ const gameUpdate = (roomId: string, playerId: string, idx: number) => {
 }
 
 const gameEnd = (roomId: string) => {
-    rooms[roomId].isPlay = false;
+    let room = rooms[roomId];
+    room.status = "ended";
+    room.isPlay = false;
 }
 
 

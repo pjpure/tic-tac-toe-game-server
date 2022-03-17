@@ -4,6 +4,7 @@ export interface Room {
     board: string[];
     players: Player[];
     isPlay: boolean;
+    status: "waiting" | "playing" | "ended";
 }
 
 

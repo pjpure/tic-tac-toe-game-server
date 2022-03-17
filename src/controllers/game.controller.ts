@@ -8,10 +8,7 @@ function GameController(io: Server, socket: Socket) {
         if (room == -1) {
             return;
         }
-        const player1 = room.players[0];
-        const player2 = room.players[1];
-        io.to(player1.id).emit("game:updated", { player: player1, board: room.board });
-        io.to(player2.id).emit("game:updated", { player: player2, board: room.board });
+        io.in(roomId).emit("game:updated", roomId, room);
     }
     socket.on("game:update", gameUpdate);
 }

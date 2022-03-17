@@ -21,7 +21,8 @@ const createRoom = (player: Player, boardSize: number, roomId: string) => {
         players: [player],
         boardSize: boardSize,
         board: [],
-        isPlay: false
+        isPlay: false,
+        status: "waiting"
     };
     return rooms[roomId];
 }
