@@ -42,7 +42,7 @@ function RoomController(io: Server, socket: Socket) {
         } else {
             roomService.leaveRoom(roomId, socket.id);
             socket.leave(roomId);
-            io.to(roomId).emit("game:end");
+            io.to(roomId).emit("game:wait");
         }
 
     }

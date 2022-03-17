@@ -3,7 +3,6 @@ export interface Room {
     boardSize: number;
     board: string[];
     players: Player[];
-    isPlay: boolean;
     status: "waiting" | "playing" | "ended";
 }
 

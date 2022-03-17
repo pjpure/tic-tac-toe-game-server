@@ -13,7 +13,6 @@ const gameStart = (roomId: string) => {
     let room = rooms[roomId];
     room.board = createBoard(room.boardSize);
     room.status = "playing";
-    room.isPlay = true;
     room.players.forEach((player: Player, index: number) => {
         if (index == 0) {
             player.symbol = "X";
@@ -54,15 +53,15 @@ const gameUpdate = (roomId: string, playerId: string, idx: number) => {
     return room;
 }
 
-const gameEnd = (roomId: string) => {
+const gameWait = (roomId: string) => {
     let room = rooms[roomId];
-    room.status = "ended";
-    room.isPlay = false;
+    room.status = "waiting";
+    rooms[roomId] = room;
 }
 
 
 export default {
     gameStart,
     gameUpdate,
-    gameEnd
+    gameWait
 }
