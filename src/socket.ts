@@ -18,7 +18,8 @@ export default (httpServer: http.Server) => {
         GameController(io, socket);
 
         socket.on('disconnect', function () {
-            roomService.disconnectRoom(socket.id);
+            const roomId = roomService.disconnectRoom(socket.id);
+            io.to(roomId).emit("game:end");
         });
     }
 

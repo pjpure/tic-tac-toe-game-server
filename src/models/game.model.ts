@@ -1,5 +1,6 @@
 
 export interface Room {
+    boardSize: number;
     board: string[];
     players: Player[];
     isPlay: boolean;

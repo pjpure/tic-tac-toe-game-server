@@ -1,9 +1,19 @@
 import { rooms, players } from "../db";
 import { Player } from "../models/game.model";
 
+const createBoard = (size: number) => {
+    let board = [];
+    for (let i = 0; i < size * size; i++) {
+        board.push("");
+    }
+    return board;
+}
+
 const gameStart = (roomId: string) => {
-    rooms[roomId].isPlay = true;
-    rooms[roomId].players.forEach((player: Player, index: number) => {
+    let room = rooms[roomId];
+    room.board = createBoard(room.boardSize);
+    room.isPlay = true;
+    room.players.forEach((player: Player, index: number) => {
         if (index == 0) {
             player.symbol = "X";
             player.isTurn = true;
@@ -12,7 +22,8 @@ const gameStart = (roomId: string) => {
             player.isTurn = false;
         }
     });
-    return rooms[roomId];
+    rooms[roomId] = room;
+    return room;
 }
 
 const queueUpdate = (room: any) => {
@@ -42,8 +53,13 @@ const gameUpdate = (roomId: string, playerId: string, idx: number) => {
     return room;
 }
 
+const gameEnd = (roomId: string) => {
+    rooms[roomId].isPlay = false;
+}
+
 
 export default {
     gameStart,
-    gameUpdate
+    gameUpdate,
+    gameEnd
 }

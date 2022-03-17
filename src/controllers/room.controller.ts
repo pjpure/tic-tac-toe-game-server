@@ -13,7 +13,7 @@ function RoomController(io: Server, socket: Socket) {
         const player = roomService.createPlayer(socket.id, playerName, roomId);
         const room = roomService.createRoom(player, boardSize, roomId);
         socket.join(roomId);
-        socket.emit("room:created", roomId);
+        socket.emit("room:created", roomId, room);
     }
 
     const joinRoom = async ({ playerName, roomId }: { playerName: string, roomId: string }) => {
@@ -26,12 +26,13 @@ function RoomController(io: Server, socket: Socket) {
             const player = roomService.createPlayer(socket.id, playerName, roomId);
             roomService.joinRoom(roomId, player);
             socket.join(roomId);
-            socket.emit("room:joined", roomId)
             const room = gameService.gameStart(roomId);
-            const player1 = room.players[0];
-            const player2 = room.players[1];
-            io.to(player1.id).emit("game:start", { player: player1, board: room.board });
-            io.to(player2.id).emit("game:start", { player: player2, board: room.board });
+            socket.emit("room:joined", roomId, room);
+            io.in(roomId).emit("game:start", room);
+            // const player1 = room.players[0];
+            // const player2 = room.players[1];
+            // io.to(player1.id).emit("game:start", { player: player1, board: room.board });
+            // io.to(player2.id).emit("game:start", { player: player2, board: room.board });
         } else {
             socket.emit("room:full");
         }
@@ -45,6 +46,7 @@ function RoomController(io: Server, socket: Socket) {
         } else {
             roomService.leaveRoom(roomId, socket.id);
             socket.leave(roomId);
+            io.to(roomId).emit("game:end");
         }
 
     }

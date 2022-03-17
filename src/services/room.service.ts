@@ -1,5 +1,6 @@
 import { rooms, players } from "../db";
 import { Player } from "../models/game.model";
+import gameService from "./game.service";
 
 const createPlayer = (id: string, name: string, roomId: string) => {
     const player = {
@@ -13,20 +14,13 @@ const createPlayer = (id: string, name: string, roomId: string) => {
     return player;
 }
 
-const createBoard = (size: number) => {
-    let board = [];
-    for (let i = 0; i < size * size; i++) {
-        board.push("");
-    }
-    return board;
-}
+
 
 const createRoom = (player: Player, boardSize: number, roomId: string) => {
-    const board = createBoard(boardSize);
     rooms[roomId] = {
         players: [player],
         boardSize: boardSize,
-        board: board,
+        board: [],
         isPlay: false
     };
     return rooms[roomId];
@@ -40,6 +34,7 @@ const leaveRoom = (roomId: string, playerId: string) => {
     try {
         const index = rooms[roomId].players.findIndex((p: Player) => p.id === playerId);
         rooms[roomId].players.splice(index, 1);
+        gameService.gameEnd(roomId);
     } catch (e) {
         console.log(e);
     }
@@ -51,6 +46,8 @@ const disconnectRoom = (playerId: string) => {
         const roomId = players[playerId].roomId;
         leaveRoom(roomId, playerId);
         delete players[playerId];
+        return roomId;
+
     } catch (e) {
         console.log(e);
     }
@@ -60,7 +57,6 @@ const disconnectRoom = (playerId: string) => {
 export default {
     createPlayer,
     createRoom,
-    createBoard,
     joinRoom,
     leaveRoom,
     disconnectRoom

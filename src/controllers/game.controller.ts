@@ -4,7 +4,6 @@ import gameService from "../services/game.service";
 function GameController(io: Server, socket: Socket) {
 
     const gameUpdate = ({ roomId, idx }: { roomId: string, idx: number }) => {
-        console.log(`gameUpdate: ${roomId} ${idx}`);
         const room = gameService.gameUpdate(roomId, socket.id, idx);
         if (room == -1) {
             return;
