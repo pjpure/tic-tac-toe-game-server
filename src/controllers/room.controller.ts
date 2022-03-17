@@ -1,13 +1,17 @@
 import { Server, Socket } from "socket.io";
+import roomService from "../services/room.service";
+import gameService from "../services/game.service";
+import { rooms } from "../db";
 
 function RoomController(io: Server, socket: Socket) {
     const createRoomId = () => {
         return new Date().getTime().toString(36).slice(5, 8) + Math.random().toString(36).slice(2, 5);
     }
 
-    const createRoom = (playerName: string) => {
+    const createRoom = (playerName: string, boardSize: number) => {
         const roomId = createRoomId();
-        console.log(`${playerName} created room ${roomId}`);
+        const player = roomService.createPlayer(socket.id, playerName, roomId);
+        const room = roomService.createRoom(player, boardSize, roomId);
         socket.join(roomId);
         socket.emit("room:created", roomId);
     }
@@ -18,20 +22,31 @@ function RoomController(io: Server, socket: Socket) {
 
         if (numClients <= 0) {
             socket.emit("room:notFound");
-            console.log(`${playerName} tried to join room ${roomId} but it doesn't exist`);
-        } else if (numClients <= 1) {
+        } else if (numClients == 1) {
+            const player = roomService.createPlayer(socket.id, playerName, roomId);
+            roomService.joinRoom(roomId, player);
             socket.join(roomId);
             socket.emit("room:joined", roomId)
-            console.log(`${playerName} joined room ${roomId}`);
+            const room = gameService.gameStart(roomId);
+            const player1 = room.players[0];
+            const player2 = room.players[1];
+            io.to(player1.id).emit("game:start", { player: player1, board: room.board });
+            io.to(player2.id).emit("game:start", { player: player2, board: room.board });
         } else {
             socket.emit("room:full");
-            console.log(`${playerName} tried to join room ${roomId} but it was full`);
         }
     }
 
     const leaveRoom = ({ playerName, roomId }: { playerName: string, roomId: string }) => {
-        console.log(`${playerName} left room ${roomId}`);
-        socket.leave(roomId);
+        const clients = io.sockets.adapter.rooms.get(roomId);
+        const numClients = clients ? clients.size : 0;
+        if (numClients <= 1) {
+            delete rooms[roomId];
+        } else {
+            roomService.leaveRoom(roomId, socket.id);
+            socket.leave(roomId);
+        }
+
     }
 
     socket.on("room:create", createRoom);
