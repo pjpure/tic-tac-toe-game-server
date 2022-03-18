@@ -1,3 +1,6 @@
 # tic-tac-toe-game-server
 
-[Play here](https://tictactoe-pjpure.netlify.app/)
+tic-tac-toe: [Play here](https://tictactoe-pjpure.netlify.app/)
+
+frontend: https://github.com/pjpure/tic-tac-toe-game
+
