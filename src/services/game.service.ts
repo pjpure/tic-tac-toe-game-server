@@ -74,9 +74,67 @@ const gameWait = (roomId: string) => {
 
 }
 
+const gameGiveUp = (roomId: string, playerId: string) => {
+    try {
+        let room: Room = rooms[roomId];
+        room.players.forEach((player: Player) => {
+            if (player.id !== playerId) {
+                player.isWinner = true;
+            }
+        })
+        room.status = "ended";
+        rooms[roomId] = room;
+        return room;
+    } catch (e) {
+        console.log('gameGiveUp', e);
+        return -1;
+    }
+
+}
+
+const gamePlayAgain = (roomId: string, playerId: string) => {
+    try {
+        let room: Room = rooms[roomId];
+        room.board = createBoard(room.boardSize);
+        if (room.status === "ended") {
+            room.status = "waiting";
+            room.players.forEach((player: Player) => {
+                if (player.id === playerId) {
+                    player.isTurn = false;
+                    player.isWinner = false;
+                }
+            });
+
+        } else {
+            room.status = "playing";
+            room.players.forEach((player: Player, index: number) => {
+                if (index == 0) {
+                    player.symbol = "X";
+                    player.isTurn = true;
+                    player.isWinner = false;
+                } else {
+                    player.symbol = "O";
+                    player.isTurn = false;
+                    player.isWinner = false;
+                }
+            });
+        }
+
+        rooms[roomId] = room;
+        return room;
+
+    } catch (e) {
+        console.log('gamePlayAgain', e);
+        return -1;
+    }
+
+}
+
 
 export default {
     gameStart,
     gameUpdate,
-    gameWait
+    gameWait,
+    gameGiveUp,
+    gamePlayAgain
 }

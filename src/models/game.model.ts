@@ -13,5 +13,6 @@ export interface Player {
     name: string;
     symbol: string;
     isTurn: boolean;
+    isWinner: boolean;
 }
 

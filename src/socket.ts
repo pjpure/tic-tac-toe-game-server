@@ -19,7 +19,8 @@ export default (httpServer: http.Server) => {
 
         socket.on('disconnect', function () {
             const roomId = roomService.disconnectRoom(socket.id);
-            io.to(roomId).emit("game:wait");
+            if (roomId) { io.to(roomId).emit("game:wait"); }
+
         });
     }
 
