@@ -9,7 +9,7 @@ const createPlayer = (id: string, name: string, roomId: string) => {
         name,
         symbol: "",
         isTurn: false,
-        isWinner: false
+        status: ""
     };
     players[id] = player;
     return player;

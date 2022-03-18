@@ -52,13 +52,21 @@ const gameUpdate = (roomId: string, playerId: string, idx: number) => {
             return -1;
         }
         room.board[idx] = room.players[0].symbol;
-        const { isWin, board } = gameCheckWinner(room.board, room.players[0].symbol, idx);
-        if (isWin) {
+        const { status, board } = gameCheckWinner(room.board, room.players[0].symbol, idx);
+        if (status === 'win') {
             room.status = "ended";
             room.players.forEach((player: Player) => {
                 if (player.id === playerId) {
-                    player.isWinner = true;
+                    player.status = 'win';
+                } else {
+                    player.status = 'lose';
                 }
+            })
+            room.board = board;
+        } else if (status === 'draw') {
+            room.status = "ended";
+            room.players.forEach((player: Player) => {
+                player.status = 'draw';
             })
             room.board = board;
         }
@@ -88,7 +96,9 @@ const gameGiveUp = (roomId: string, playerId: string) => {
         let room: Room = rooms[roomId];
         room.players.forEach((player: Player) => {
             if (player.id !== playerId) {
-                player.isWinner = true;
+                player.status = 'win';
+            } else {
+                player.status = 'lose';
             }
         })
         room.status = "ended";
@@ -110,7 +120,7 @@ const gamePlayAgain = (roomId: string, playerId: string) => {
             room.players.forEach((player: Player) => {
                 if (player.id === playerId) {
                     player.isTurn = false;
-                    player.isWinner = false;
+                    player.status = "";
                 }
             });
 
@@ -120,11 +130,11 @@ const gamePlayAgain = (roomId: string, playerId: string) => {
                 if (index == 0) {
                     player.symbol = "X";
                     player.isTurn = true;
-                    player.isWinner = false;
+                    player.status = "";
                 } else {
                     player.symbol = "O";
                     player.isTurn = false;
-                    player.isWinner = false;
+                    player.status = "";
                 }
             });
         }
@@ -161,7 +171,7 @@ const gameCheckWinner = (board: string[], symbol: string, idx: number) => {
         for (let i = boardSize * row; i < boardSize * (row + 1); i++) {
             board[i] = 'W' + symbol;
         }
-        return { isWin: true, board: board };
+        return { status: 'win', board: board };
     }
 
     //column check
@@ -176,7 +186,7 @@ const gameCheckWinner = (board: string[], symbol: string, idx: number) => {
         for (let i = col; i < board.length; i += boardSize) {
             board[i] = 'W' + symbol;
         }
-        return { isWin: true, board: board };
+        return { status: 'win', board: board };
     }
 
     //diagonal1 check
@@ -192,7 +202,7 @@ const gameCheckWinner = (board: string[], symbol: string, idx: number) => {
             for (let i = 0; i < board.length; i += boardSize + 1) {
                 board[i] = 'W' + symbol;
             }
-            return { isWin: true, board: board };
+            return { status: 'win', board: board };
         }
     }
 
@@ -209,11 +219,22 @@ const gameCheckWinner = (board: string[], symbol: string, idx: number) => {
             for (let i = boardSize - 1; i < board.length - (boardSize - 1); i += boardSize - 1) {
                 board[i] = 'W' + symbol;
             }
-            return { isWin: true, board: board };
+            return { status: 'win', board: board };
         }
 
     }
-    return { isWin: false, board: board };
+
+    //draw check
+    let drawCount = 0;
+    for (let i = 0; i < board.length; i++) {
+        if (board[i] !== '') {
+            drawCount++;
+        }
+    }
+    if (drawCount === board.length) {
+        return { status: 'draw', board: board };
+    }
+    return { status: '', board: board };
 }
 
 
