@@ -1,9 +1,9 @@
 import { rooms, players } from "../db";
-import { Player } from "../models/game.model";
+import { Player, Room } from "../models/game.model";
 import gameService from "./game.service";
 
 const createPlayer = (id: string, name: string, roomId: string) => {
-    const player = {
+    const player: Player = {
         id,
         roomId,
         name,
@@ -27,7 +27,12 @@ const createRoom = (player: Player, boardSize: number, roomId: string) => {
 }
 
 const joinRoom = (roomId: string, player: Player) => {
-    rooms[roomId].players.push(player);
+    try {
+        rooms[roomId].players.push(player);
+    } catch (e) {
+        console.log('joinRoom', e);
+    }
+
 }
 
 const leaveRoom = (roomId: string, playerId: string) => {
@@ -36,7 +41,7 @@ const leaveRoom = (roomId: string, playerId: string) => {
         rooms[roomId].players.splice(index, 1);
         gameService.gameWait(roomId);
     } catch (e) {
-        console.log(e);
+        console.log('leaveRoom', e);
     }
 
 }
@@ -49,7 +54,7 @@ const disconnectRoom = (playerId: string) => {
         return roomId;
 
     } catch (e) {
-        console.log(e);
+        console.log('disconnectRoom', e);
     }
 
 }

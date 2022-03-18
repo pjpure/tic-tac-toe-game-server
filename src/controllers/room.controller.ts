@@ -38,7 +38,12 @@ function RoomController(io: Server, socket: Socket) {
         const clients = io.sockets.adapter.rooms.get(roomId);
         const numClients = clients ? clients.size : 0;
         if (numClients <= 1) {
-            delete rooms[roomId];
+            try {
+                delete rooms[roomId];
+            }
+            catch (e) {
+                console.log('delete room', e);
+            }
         } else {
             roomService.leaveRoom(roomId, socket.id);
             socket.leave(roomId);
