@@ -9,6 +9,7 @@ const createPlayer = (id: string, name: string, roomId: string) => {
         name,
         symbol: "",
         isTurn: false,
+        status: ""
     };
     players[id] = player;
     return player;
@@ -37,9 +38,14 @@ const joinRoom = (roomId: string, player: Player) => {
 
 const leaveRoom = (roomId: string, playerId: string) => {
     try {
-        const index = rooms[roomId].players.findIndex((p: Player) => p.id === playerId);
-        rooms[roomId].players.splice(index, 1);
-        gameService.gameWait(roomId);
+        const players = rooms[roomId].players
+        if (players) {
+            const index = players.findIndex((p: Player) => p.id === playerId);
+            if (index !== -1) {
+                rooms[roomId].players.splice(index, 1);
+                gameService.gameWait(roomId);
+            }
+        }
     } catch (e) {
         console.log('leaveRoom', e);
     }
@@ -49,10 +55,11 @@ const leaveRoom = (roomId: string, playerId: string) => {
 const disconnectRoom = (playerId: string) => {
     try {
         const roomId = players[playerId].roomId;
-        leaveRoom(roomId, playerId);
-        delete players[playerId];
-        return roomId;
-
+        if (roomId) {
+            leaveRoom(roomId, playerId);
+            delete players[playerId];
+            return roomId;
+        }
     } catch (e) {
         console.log('disconnectRoom', e);
     }
